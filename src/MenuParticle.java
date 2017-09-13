@@ -21,23 +21,16 @@ public class MenuParticle extends GameObject {
         col=new Color(r.nextInt(255),r.nextInt(255),r.nextInt(255));
     }
 
-    public Rectangle[] getBounds(){
-        Rectangle[] rect=new Rectangle[6];
-        rect[0]=new Rectangle((int)x+16,(int)y+16,16,16);
-        rect[1]=new Rectangle((int)x-16,(int)y+16,16,16);
-        rect[2]=new Rectangle((int)x,(int)y+32,16,16);
-        rect[3]=new Rectangle((int)x+16,(int)y+48,16,16);
-        rect[4]=new Rectangle((int)x-16,(int)y+48,16,16);
-        rect[5]=new Rectangle((int)x,(int)y+64,16,16);
-        return rect;
+    public Rectangle getBounds(){
+        return new Rectangle((int)x,(int)y,16,16);
     }
-
     public void tick() {
+        x+=velX;
         y+=velY;
-
         if(y<=0 || y>=Game.HEIGHT -42) velY*=-1;
         if(x<=0 || x>=Game.WIDTH -16) velX*=-1;
 
+        handler.addObject(new Trail(x,0.05f,y,ID.Trail,col,handler,16,16 ));
     }
 
     public void render (Graphics g){

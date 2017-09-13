@@ -2,56 +2,60 @@ import java.awt.*;
 import java.awt.image.BufferStrategy;
 import java.util.Random;
 
-
 /**
  * Created by Xlv QT on 11/23/2016.
  */
 public class Game extends Canvas implements Runnable {
 
+    private static final long serialVersionUID = 650585600015374672L;
+    public static final int WIDTH=640, HEIGHT=WIDTH/12*9;
 
-    private static final long serialVersionUID = 3382877282005793312L;
-    public static final int WIDTH=320, HEIGHT=WIDTH/6*10;
     private Thread thread;
     private boolean running=false;
-    private HUD hud;
-    private Spawn spawner;
+
     private Random r;
     private Handler handler;
+    private HUD hud;
+    private Spawn spawner;
     public Menu menu;
     public enum STATE {
         Menu,
         Help,
+        End,
         Game
     };
 
-    public STATE gameState=STATE.Menu;
+    public static STATE gameState=STATE.Menu;
 
-    public Game() {
-        handler = new Handler();
-        menu = new Menu(this, handler);
+    public Game(){
+        handler=new Handler();
+        hud=new HUD();
+        menu=new Menu(this,handler,hud);
         this.addKeyListener(new KeyInput(handler));
         this.addMouseListener(menu);
-
+        
         AudioPlayer.load();
         
         AudioPlayer.getMusic("music").loop();
         
-        new Window(WIDTH, HEIGHT, "Formula 1", this);
-        hud = new HUD();
-        spawner = new Spawn(handler, hud);
-        r = new Random();
-        if (gameState == STATE.Game) {
-            handler.addObject(new Player(WIDTH/2-32,HEIGHT-92,ID.Player,handler,this));
-        }
-        else{
-            for(int i=0;i<15;i++)
+        
+        
+        new Window(WIDTH,HEIGHT,"Let's build a game!",this);
+
+        spawner=new Spawn(handler,hud);
+
+        r=new Random();
+        if(gameState==STATE.Game ){
+            handler.addObject(new Player(WIDTH/2-32,HEIGHT/2-32,ID.Player,handler));
+            handler.addObject(new BasicEnemy(r.nextInt(Game.WIDTH-50), r.nextInt(Game.HEIGHT-50), ID.BasicEnemy, handler));
+        }else{
+            for(int i=0;i<15;i++){
                 handler.addObject(new MenuParticle(r.nextInt(WIDTH),r.nextInt(HEIGHT),ID.MenuParticle,handler));
+
+            }
         }
     }
 
-    public void setListener(KeyInput x){
-        this.addKeyListener(x);
-    }
 
     public synchronized void start(){
         thread=new Thread(this);
@@ -68,43 +72,54 @@ public class Game extends Canvas implements Runnable {
         }
     }
 
-    public void run () {
-            this.requestFocus();
-            long lastTime = System.nanoTime();
-            double amountOfTicks = 60.0;
-            double ns = 1000000000 / amountOfTicks;
-            double delta = 0;
-            long timer = System.currentTimeMillis();
-            int frames = 0;
-            while (running) {
-                long now = System.nanoTime();
-                delta += (now - lastTime) / ns;
-                lastTime = now;
-                while (delta >= 1) {
-                    tick();
-                    delta--;
-                }
-                if (running)
-                    render();
-                frames++;
+    public void run(){
+        this.requestFocus();
+        long lastTime = System.nanoTime();
+        double amountOfTicks = 60.0;
+        double ns = 1000000000 / amountOfTicks;
+        double delta = 0;
+        long timer = System.currentTimeMillis();
+        int frames = 0;
+        while(running) {
+            long now = System.nanoTime();
+            delta += (now - lastTime) / ns;
+            lastTime = now;
+            while(delta >=1) {
+                tick();
+                delta--;
+            } if(running)
+                render();
+            frames++;
 
-                if (System.currentTimeMillis() - timer > 1000) {
-                    timer += 1000;
-                    System.out.println("FPS: " + frames);
-                    frames = 0;
-                }
+            if(System.currentTimeMillis() - timer > 1000) {
+                timer += 1000;
+                System .out.println("FPS: "+ frames);
+                frames = 0;
             }
-            stop();
         }
+        stop();
+    }
 
     private void tick(){
         handler.tick();
         if(gameState==STATE.Game){
             hud.tick();
             spawner.tick();
-        }else if(gameState==STATE.Menu || gameState==STATE.Help){
+
+            if(HUD.HEALTH<=0){
+                HUD.HEALTH=100;
+
+                gameState=STATE.End;
+                handler.clearEnemies();
+                for(int i=0;i<15;i++){
+                    handler.addObject(new MenuParticle(r.nextInt(WIDTH),r.nextInt(HEIGHT),ID.MenuParticle,handler));
+                }
+
+            }
+        }else if(gameState==STATE.Menu || gameState==STATE.End){
             menu.tick();
         }
+
     }
 
     private void render(){
@@ -123,7 +138,7 @@ public class Game extends Canvas implements Runnable {
         if(gameState==STATE.Game){
             hud.render(g);
         }
-        else if(gameState==STATE.Menu || gameState==STATE.Help){
+        else if(gameState==STATE.Menu || gameState==STATE.Help || gameState==STATE.End){
             menu.render(g);
         }
 
@@ -131,13 +146,11 @@ public class Game extends Canvas implements Runnable {
         bs.show();
     }
 
-
-
-    public static int clamp(int var, int min, int max){
+    public static float clamp(float var, float min, float max){
         if(var>=max)
             return var=max;
         else if(var<=min) return var=min;
-        else
+            else
             return var;
     }
 
@@ -145,4 +158,3 @@ public class Game extends Canvas implements Runnable {
         new Game();
     }
 }
-

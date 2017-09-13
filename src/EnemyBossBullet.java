@@ -1,16 +1,17 @@
 import java.awt.*;
+import java.util.Random;
 
 /**
  * Created by Xlv QT on 11/24/2016.
  */
-public class BasicEnemy extends GameObject {
+public class EnemyBossBullet extends GameObject {
 
     private Handler handler;
-
-    public BasicEnemy(float x, float y, ID id,Handler handler){
+    Random r=new Random();
+    public EnemyBossBullet(float x, float y, ID id,Handler handler){
         super(x,y,id);
         this.handler=handler;
-        velX=5;
+        velX=r.nextInt((5- -5)+ -5);
         velY=5;
     }
 
@@ -20,9 +21,9 @@ public class BasicEnemy extends GameObject {
     public void tick() {
         x+=velX;
         y+=velY;
-        if(y<=0 || y>=Game.HEIGHT -42) velY*=-1;
-        if(x<=0 || x>=Game.WIDTH -16) velX*=-1;
-
+        //if(y<=0 || y>=Game.HEIGHT -42) velY*=-1;
+        //if(x<=0 || x>=Game.WIDTH -16) velX*=-1;
+        if(y>=Game.HEIGHT) handler.removeObject(this);
         handler.addObject(new Trail(x,0.05f,y,ID.Trail,Color.red,handler,16,16 ));
     }
 

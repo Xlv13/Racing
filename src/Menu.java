@@ -7,47 +7,62 @@ import java.util.Random;
  * Created by Darius on 2/23/2017.
  */
 public class Menu extends MouseAdapter{
-    private int maxScore;
+
     private Game game;
     private Handler handler;
+    private HUD hud;
+
     private Random r=new Random();
-    public Menu(Game game,Handler handler){
+
+    public Menu(Game game,Handler handler,HUD hud){
         this.game=game;
         this.handler=handler;
+        this.hud=hud;
     }
     public void mousePressed(MouseEvent e){
         int mx=e.getX();
         int my=e.getY();
         if(game.gameState== Game.STATE.Menu){
-            if(mouseOver(mx,my,90,110,150,64)){
-                HUD.score=0;
-                HUD.level=0;
-                GameObject.incr=0.4;
-                game.addKeyListener(new KeyInput(handler));
-                AudioPlayer.getSound("menu_sound").play();
-                handler.clearMenu();
-                handler.addObject(new Player(Game.WIDTH/2-32,Game.HEIGHT-92,ID.Player,handler,game));
+            if(mouseOver(mx,my,210,150,200,64)){
                 game.gameState= Game.STATE.Game;
+                handler.addObject(new Player(Game.WIDTH/2-32,Game.HEIGHT/2-32,ID.Player,handler));
+                handler.clearEnemies();
+                handler.addObject(new BasicEnemy(r.nextInt(Game.WIDTH-50), r.nextInt(Game.HEIGHT-50), ID.BasicEnemy, handler));
+                AudioPlayer.getSound("menu_sound").play();
             }
+
+
             //help
-            if(mouseOver(mx,my,90,210,150,64)){
+            if(mouseOver(mx,my,210,250,200,64)){
                 game.gameState= Game.STATE.Help;
                 AudioPlayer.getSound("menu_sound").play();
             }
 
             //quit
-            if(mouseOver(mx,my,90,310,150,64)){
-            	AudioPlayer.getSound("menu_sound").play();
+            if(mouseOver(mx,my,210,350,200,64)){
                 System.exit(1);
+                AudioPlayer.getSound("menu_sound").play();
             }
 
         }
 
         if(game.gameState== Game.STATE.Help){
-            if(mouseOver(mx,my,90,370,150,64)){
+            if(mouseOver(mx,my,210,350,200,64)){
                 game.gameState= Game.STATE.Menu;
                 AudioPlayer.getSound("menu_sound").play();
                 return;
+            }
+        }
+
+        if(game.gameState== Game.STATE.End){
+            if(mouseOver(mx,my,210,350,200,64)){
+                game.gameState= Game.STATE.Game;
+                hud.setLevel(1);
+                hud.setScore(0);
+                handler.addObject(new Player(Game.WIDTH/2-32,Game.HEIGHT/2-32,ID.Player,handler));
+                handler.clearEnemies();
+                handler.addObject(new BasicEnemy(r.nextInt(Game.WIDTH-50), r.nextInt(Game.HEIGHT-50), ID.BasicEnemy, handler));
+                AudioPlayer.getSound("menu_sound").play();
             }
         }
     }
@@ -65,50 +80,58 @@ public class Menu extends MouseAdapter{
     }
 
     public void tick(){
+
     }
 
 
     public void render(Graphics g) {
-        if(maxScore<HUD.score)
-        maxScore=HUD.score;
         if (game.gameState == Game.STATE.Menu) {
-            Font fnt = new Font("arial", 1, 40);
-            Font fnt2 = new Font("arial", 1, 25);
-            Font fnt3 = new Font("arial", 1, 15);
+            Font fnt = new Font("arial", 1, 50);
+            Font fnt2 = new Font("arial", 1, 30);
+
             g.setFont(fnt);
             g.setColor(Color.white);
-            g.drawString("Menu", 110, 35);
+            g.drawString("Wave", 240, 70);
 
             g.setFont(fnt2);
 
-            g.drawRect(90, 110, 150, 64);
-            g.drawString("Play", 140, 150);
+            g.drawRect(210, 150, 200, 64);
+            g.drawString("Play", 270, 190);
 
-            g.drawRect(90, 210, 150, 64);
-            g.drawString("Help", 140, 250);
+            g.drawRect(210, 250, 200, 64);
+            g.drawString("Help", 270, 290);
 
-            g.drawRect(90, 310, 150, 64);
-            g.drawString("Quit", 140, 350);
-
-            g.setFont(fnt3);
-            g.drawString("Your max score is: "+maxScore, 90, 480);
+            g.drawRect(210, 350, 200, 64);
+            g.drawString("Quit", 270, 390);
         } else if (game.gameState == Game.STATE.Help) {
-            Font fnt = new Font("arial", 1, 40);
-            Font fnt2 = new Font("arial", 1, 25);
-            Font fnt3 = new Font("arial", 1, 15);
+            Font fnt = new Font("arial", 1, 50);
+            Font fnt2 = new Font("arial", 1, 30);
+            Font fnt3 = new Font("arial", 1, 20);
             g.setFont(fnt);
             g.setColor(Color.white);
-            g.drawString("Help", 110, 35);
+            g.drawString("Help", 240, 70);
 
             g.setFont(fnt3);
-            g.drawString("Use arrow keys to move player and",10,200);
-            g.drawString("dodge enemies",5,220);
-
+            g.drawString("Use WASD keys to move player and dodge enemies",10,200);
 
             g.setFont(fnt2);
-            g.drawRect(90, 370, 150, 64);
-            g.drawString("Back", 140, 410);
-        }
+            g.drawRect(210, 350, 200, 64);
+            g.drawString("Back", 270, 390);
+        }else if (game.gameState == Game.STATE.End) {
+            Font fnt = new Font("arial", 1, 50);
+            Font fnt2 = new Font("arial", 1, 30);
+            Font fnt3 = new Font("arial", 1, 20);
+            g.setFont(fnt);
+            g.setColor(Color.white);
+            g.drawString("Game Over", 180, 70);
 
+            g.setFont(fnt3);
+            g.drawString("You lost with a score of: " + hud.getScore(), 175, 200);
+
+            g.setFont(fnt2);
+            g.drawRect(210, 350, 200, 64);
+            g.drawString("Try Again", 245, 390);
+
+        }
     }
 }

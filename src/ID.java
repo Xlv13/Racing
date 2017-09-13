@@ -3,11 +3,10 @@
  */
 public enum ID {
     Player(),
-    Player2(),
     BasicEnemy(),
-    FastEnemy(),
-    Truck(),
-    MenuParticle(),
-    Bike();
-
+    Trail(),
+    SmartEnemy(),
+    EnemyBoss,
+    MenuParticle,
+    FastEnemy();
 }

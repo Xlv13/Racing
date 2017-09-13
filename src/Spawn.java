@@ -9,7 +9,6 @@ public class Spawn {
     private HUD hud;
     private Random r=new Random();
     private int scoreKeep=0;
-    private int count=0;
 
     public Spawn (Handler handler,HUD hud){
         this.handler=handler;
@@ -18,43 +17,34 @@ public class Spawn {
 
     public void tick(){
         scoreKeep++;
-        count++;
-        if(count>=500) {
-            hud.setLevel(hud.getLevel() + 1);
-            count=0;
-        }
-        if(scoreKeep>=65){
-            scoreKeep = 0;
-            if(r.nextInt(30)%2==0){
-                handler.addObject(new BasicEnemy(16+r.nextInt(Game.WIDTH-54),-100,ID.BasicEnemy,handler));
-                if(r.nextInt(30)%2==0)
-                    handler.addObject(new BasicEnemy(16+r.nextInt(Game.WIDTH-54),-250,ID.BasicEnemy,handler));
-                else
-                    handler.addObject(new FastEnemy(16+r.nextInt(Game.WIDTH-54),-250, ID.FastEnemy, handler));
-            }else {
-                handler.addObject(new FastEnemy(16+r.nextInt(Game.WIDTH-54),-100, ID.FastEnemy, handler));
-                if(r.nextInt(30)%2==0)
-                    handler.addObject(new BasicEnemy(16+r.nextInt(Game.WIDTH-54),-250,ID.BasicEnemy,handler));
-                else
-                    handler.addObject(new FastEnemy(16+r.nextInt(Game.WIDTH-54),-250, ID.FastEnemy, handler));
+        if(scoreKeep>=100){
+            scoreKeep=0;
+            hud.setLevel(hud.getLevel()+1);
+            if(hud.getLevel()==2){
+                handler.addObject(new BasicEnemy(r.nextInt(Game.WIDTH-50), r.nextInt(Game.HEIGHT-50), ID.BasicEnemy, handler));
+
+            }else if(hud.getLevel()==3 ) {
+                handler.addObject(new BasicEnemy(r.nextInt(Game.WIDTH-50), r.nextInt(Game.HEIGHT-50), ID.BasicEnemy, handler));
+                //handler.addObject(new BasicEnemy(r.nextInt(Game.WIDTH-50), r.nextInt(Game.HEIGHT-50), ID.BasicEnemy, handler));
+            }else if(hud.getLevel()==4 ) {
+                handler.addObject(new FastEnemy(r.nextInt(Game.WIDTH - 50), r.nextInt(Game.HEIGHT - 50), ID.FastEnemy, handler));
+                //handler.addObject(new FastEnemy(r.nextInt(Game.WIDTH - 50), r.nextInt(Game.HEIGHT - 50), ID.FastEnemy, handler));
             }
-        }else
-        if(scoreKeep>=3000){
-            scoreKeep = 0;
-            if(r.nextInt(30)%2==0){
-                handler.addObject(new BasicEnemy(16+r.nextInt(Game.WIDTH-54),-150,ID.BasicEnemy,handler));
-                handler.addObject(new FastEnemy(16+r.nextInt(Game.WIDTH-54),-100, ID.FastEnemy, handler));
-                if(r.nextInt(30)%2==0)
-                    handler.addObject(new BasicEnemy(16+r.nextInt(Game.WIDTH-54),-250,ID.BasicEnemy,handler));
-                else
-                    handler.addObject(new FastEnemy(16+r.nextInt(Game.WIDTH-54),-250, ID.FastEnemy, handler));
-            }else {
-                handler.addObject(new BasicEnemy(16+r.nextInt(Game.WIDTH-54),-150,ID.BasicEnemy,handler));
-                handler.addObject(new FastEnemy(16+r.nextInt(Game.WIDTH-54),-100, ID.FastEnemy, handler));
-                if(r.nextInt(30)%2==0)
-                    handler.addObject(new BasicEnemy(16+r.nextInt(Game.WIDTH-54),-250,ID.BasicEnemy,handler));
-                else
-                    handler.addObject(new FastEnemy(16+r.nextInt(Game.WIDTH-54),-250, ID.FastEnemy, handler));
+            else if(hud.getLevel()==5 ) {
+                handler.addObject(new SmartEnemy(r.nextInt(Game.WIDTH - 50), r.nextInt(Game.HEIGHT - 50), ID.SmartEnemy, handler));
+            }
+            else if(hud.getLevel()==6 ) {
+                handler.addObject(new FastEnemy(r.nextInt(Game.WIDTH - 50), r.nextInt(Game.HEIGHT - 50), ID.FastEnemy, handler));
+                handler.addObject(new FastEnemy(r.nextInt(Game.WIDTH - 50), r.nextInt(Game.HEIGHT - 50), ID.FastEnemy, handler));
+            }
+            else if(hud.getLevel()==7 ) {
+                handler.addObject(new FastEnemy(r.nextInt(Game.WIDTH - 50), r.nextInt(Game.HEIGHT - 50), ID.FastEnemy, handler));
+                handler.addObject(new FastEnemy(r.nextInt(Game.WIDTH - 50), r.nextInt(Game.HEIGHT - 50), ID.FastEnemy, handler));
+            }
+            else if(hud.getLevel()==10 ) {
+                handler.clearEnemies();
+                handler.addObject(new EnemyBoss(Game.WIDTH/2-48, -120, ID.EnemyBoss, handler));
+                //handler.addObject(new FastEnemy(r.nextInt(Game.WIDTH - 50), r.nextInt(Game.HEIGHT - 50), ID.FastEnemy, handler));
             }
         }
     }
